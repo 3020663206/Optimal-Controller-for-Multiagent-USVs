@@ -33,6 +33,7 @@ centers_a_2 = torch.randn(num_centers, n_out_a_2)
 
 T = 0.1
 
+NumberofHunters = 3
 
 class model():
 
@@ -159,9 +160,11 @@ class RBF(torch.nn.Module):
                 m.bias.data.zero_()
 
 
-model_1 = model(0, 0, 0, 0, 0, 0)
-model_2 = model(0, 0, 0, 0, 0, 0)
-model_3 = model(0, 0, 0, 0, 0, 0)
+#model_1 = model(0, 0, 0, 0, 0, 0)
+#model_2 = model(0, 0, 0, 0, 0, 0)
+#model_3 = model(0, 0, 0, 0, 0, 0)
+
+allhunters = [model(0, 0, 0, 0, 0, 0) for i in range(NumberofHunters)]
 
 model_c_1 = RBF(centers_c_1, n_out_c_1)
 model_a_1 = RBF(centers_a_1, n_out_a_1)
@@ -172,36 +175,46 @@ epochs = 500
 a_hat_dot = 0
 
 for epoch in range(epochs):
-    # critic 网络更新
-    out_put_c_1 = model_c_1(model_1.z_1)
-    dot_v_1 = 2 * zeta_1 * model_1.z_1 + out_put_c_1
-    out_put_a_1 = model_a_1(model_1.z_1)
-    a_hat = np.linalg.inv(R) * model_1.lambda_1 * (-zeta_1 * model_1.z_1 - 1 / 2 * out_put_a_1)
-    omaga_c_1 = -model_c_1.forward(model_1.z_1)[1] * [
-        model_1.a * zeta_1 * model_1.z_1 + 1 / 2 * model_1.a * out_put_a_1 + model_1.lambda_2]
-    model_c_1.linear.weight += (-gamma_c_1 / (1 + omaga_c_1 * omaga_c_1.T) * omaga_c_1 * [-2 * zeta_1 * model_1.z_1.T * model_1.lambda_2
-                                 - (model_1.a * zeta_1 * zeta_1 - 1) * model_1.z_1.T * model_1.z_1 + 1 / 4 * model_1.a * out_put_a_1 * out_put_a_1.T + omaga_c_1.T * model_c_1.linear.weight])
-    model_a_1.linear.weight += (1 / 2 * model_c_1.forward(model_1.z_1)[1].T * model_1.z_1 + gamma_c_1 / (
-                4 * (1 + omaga_c_1 * omaga_c_1.T))
-                                * model_c_1.forward(model_1.z_1)[1].T * model_c_1.forward(model_1.z_1)[
-                                    1] * model_a_1.linear.weight * omaga_c_1.T * model_c_1.linear.weight
-                                - gamma_a_1 * model_c_1.forward(model_1.z_1)[1].T * model_c_1.forward(model_1.z_1)[
-                                    1] * model_a_1.linear.weight)
 
-    # actor 网络更新
-    output_c_2 = model_c_1(model_1.z_2)
-    dot_v_2 = 2 * zeta_2 * model_1.z_2 + output_c_2
-    out_put_a_2 = model_a_2(model_1.z_2)
-    u_hat = -zeta_2 * model_1.z_2 - 1/2 * out_put_a_2
-    omaga_c_2 = -model_c_2.forward(model_1.z_2)[1] * [model_1.f_v-zeta_2 * model_1.z_2 - 1/2 * out_put_a_2 - a_hat_dot]
-    model_c_2.linear.weight += (-gamma_c_2 / (1 + omaga_c_2 * omaga_c_2.T) * omaga_c_2 * [2 * zeta_2 * model_1.z_2.T * (model_1.f_v - a_hat_dot)
-                              - (zeta_2 * zeta_2 - 1) * model_1.z_2.T * model_1.z_2 + 1 / 4 * out_put_a_2 * out_put_a_2.T + omaga_c_2.T * model_c_2.linear.weight])
-    model_a_2.linear.weight += (1 / 2 * model_c_2.forward(model_1.z_2)[1].T * model_1.z_2 + gamma_c_2 / (
-            4 * (1 + omaga_c_2 * omaga_c_2.T))
-                                * model_c_2.forward(model_1.z_2)[1].T * model_c_2.forward(model_1.z_2)[
-                                    1] * model_a_2.linear.weight * omaga_c_2.T * model_c_2.linear.weight
-                                - gamma_a_2 * model_c_2.forward(model_1.z_2)[1].T * model_c_2.forward(model_1.z_2)[
-                                    1] * model_a_2.linear.weight)
+    for i in range(NumberofHunters):
+        # critic 网络更新
+        out_put_c_1 = model_c_1(allhunters[i].z_1)
+        dot_v_1 = 2 * zeta_1 * allhunters[i].z_1 + out_put_c_1
+        out_put_a_1 = model_a_1(allhunters[i].z_1)
+        a_hat = np.linalg.inv(R) * allhunters[i].lambda_1 * (-zeta_1 * allhunters[i].z_1 - 1 / 2 * out_put_a_1)
+        omaga_c_1 = -model_c_1.forward(allhunters[i].z_1)[1] * [
+            allhunters[i].a * zeta_1 * allhunters[i].z_1 + 1 / 2 * allhunters[i].a * out_put_a_1 + allhunters[
+                i].lambda_2]
+        model_c_1.linear.weight += (-gamma_c_1 / (1 + omaga_c_1 * omaga_c_1.T) * omaga_c_1 * [
+            -2 * zeta_1 * allhunters[i].z_1.T * allhunters[i].lambda_2
+            - (allhunters[i].a * zeta_1 * zeta_1 - 1) * allhunters[i].z_1.T * allhunters[i].z_1 + 1 / 4 * allhunters[
+                i].a * out_put_a_1 * out_put_a_1.T + omaga_c_1.T * model_c_1.linear.weight])
+        model_a_1.linear.weight += (
+                    1 / 2 * model_c_1.forward(allhunters[i].z_1)[1].T * allhunters[i].z_1 + gamma_c_1 / (
+                    4 * (1 + omaga_c_1 * omaga_c_1.T))
+                    * model_c_1.forward(allhunters[i].z_1)[1].T * model_c_1.forward(allhunters[i].z_1)[
+                        1] * model_a_1.linear.weight * omaga_c_1.T * model_c_1.linear.weight
+                    - gamma_a_1 * model_c_1.forward(allhunters[i].z_1)[1].T * model_c_1.forward(allhunters[i].z_1)[
+                        1] * model_a_1.linear.weight)
+
+        # actor 网络更新
+        output_c_2 = model_c_1(allhunters[i].z_2)
+        dot_v_2 = 2 * zeta_2 * allhunters[i].z_2 + output_c_2
+        out_put_a_2 = model_a_2(allhunters[i].z_2)
+        u_hat = -zeta_2 * allhunters[i].z_2 - 1 / 2 * out_put_a_2
+        omaga_c_2 = -model_c_2.forward(allhunters[i].z_2)[1] * [
+            allhunters[i].f_v - zeta_2 * allhunters[i].z_2 - 1 / 2 * out_put_a_2 - a_hat_dot]
+        model_c_2.linear.weight += (-gamma_c_2 / (1 + omaga_c_2 * omaga_c_2.T) * omaga_c_2 * [
+            2 * zeta_2 * allhunters[i].z_2.T * (allhunters[i].f_v - a_hat_dot)
+            - (zeta_2 * zeta_2 - 1) * allhunters[i].z_2.T * allhunters[
+                i].z_2 + 1 / 4 * out_put_a_2 * out_put_a_2.T + omaga_c_2.T * model_c_2.linear.weight])
+        model_a_2.linear.weight += (
+                    1 / 2 * model_c_2.forward(allhunters[i].z_2)[1].T * allhunters[i].z_2 + gamma_c_2 / (
+                    4 * (1 + omaga_c_2 * omaga_c_2.T))
+                    * model_c_2.forward(allhunters[i].z_2)[1].T * model_c_2.forward(allhunters[i].z_2)[
+                        1] * model_a_2.linear.weight * omaga_c_2.T * model_c_2.linear.weight
+                    - gamma_a_2 * model_c_2.forward(allhunters[i].z_2)[1].T * model_c_2.forward(allhunters[i].z_2)[
+                        1] * model_a_2.linear.weight)
 
 
 
