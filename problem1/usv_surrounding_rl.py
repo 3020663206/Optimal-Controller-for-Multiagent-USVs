@@ -186,18 +186,12 @@ for epoch in range(epochs):
             allhunters[i].a * zeta_1 * allhunters[i].z_1 + 1 / 2 * allhunters[i].a * out_put_a_1 + allhunters[
                 i].lambda_2]
         # critic 网络更新
-        model_c_1.linear.weight += (-gamma_c_1 / (1 + omaga_c_1 * omaga_c_1.T) * omaga_c_1 * [
-            -2 * zeta_1 * allhunters[i].z_1.T * allhunters[i].lambda_2
-            - (allhunters[i].a * zeta_1 * zeta_1 - 1) * allhunters[i].z_1.T * allhunters[i].z_1 + 1 / 4 * allhunters[
-                i].a * out_put_a_1 * out_put_a_1.T + omaga_c_1.T * model_c_1.linear.weight])
+        model_c_1.linear.weight += (-gamma_c_1 / (1 + omaga_c_1 * omaga_c_1.T) * omaga_c_1 * [-2 * zeta_1 * allhunters[i].z_1.T * allhunters[i].lambda_2
+            - (allhunters[i].a * zeta_1 * zeta_1 - 1) * allhunters[i].z_1.T * allhunters[i].z_1 + 1 / 4 * allhunters[i].a * out_put_a_1 * out_put_a_1.T + omaga_c_1.T * model_c_1.linear.weight])
         # actor 网络更新
-        model_a_1.linear.weight += (
-                    1 / 2 * model_c_1.forward(allhunters[i].z_1)[1].T * allhunters[i].z_1 + gamma_c_1 / (
-                    4 * (1 + omaga_c_1 * omaga_c_1.T))
-                    * model_c_1.forward(allhunters[i].z_1)[1].T * model_c_1.forward(allhunters[i].z_1)[
-                        1] * model_a_1.linear.weight * omaga_c_1.T * model_c_1.linear.weight
-                    - gamma_a_1 * model_c_1.forward(allhunters[i].z_1)[1].T * model_c_1.forward(allhunters[i].z_1)[
-                        1] * model_a_1.linear.weight)
+        model_a_1.linear.weight += (1 / 2 * model_c_1.forward(allhunters[i].z_1)[1].T * allhunters[i].z_1 + gamma_c_1 / (4 * (1 + omaga_c_1 * omaga_c_1.T))
+                    * model_c_1.forward(allhunters[i].z_1)[1].T * model_c_1.forward(allhunters[i].z_1)[1] * model_a_1.linear.weight * omaga_c_1.T * model_c_1.linear.weight
+                    - gamma_a_1 * model_c_1.forward(allhunters[i].z_1)[1].T * model_c_1.forward(allhunters[i].z_1)[1] * model_a_1.linear.weight)
 
         # Step 2
         output_c_2 = model_c_1(allhunters[i].z_2)
@@ -207,18 +201,12 @@ for epoch in range(epochs):
         omaga_c_2 = -model_c_2.forward(allhunters[i].z_2)[1] * [
             allhunters[i].f_v - zeta_2 * allhunters[i].z_2 - 1 / 2 * out_put_a_2 - a_hat_dot]
         # critic 网络更新
-        model_c_2.linear.weight += (-gamma_c_2 / (1 + omaga_c_2 * omaga_c_2.T) * omaga_c_2 * [
-            2 * zeta_2 * allhunters[i].z_2.T * (allhunters[i].f_v - a_hat_dot)
-            - (zeta_2 * zeta_2 - 1) * allhunters[i].z_2.T * allhunters[
-                i].z_2 + 1 / 4 * out_put_a_2 * out_put_a_2.T + omaga_c_2.T * model_c_2.linear.weight])
+        model_c_2.linear.weight += (-gamma_c_2 / (1 + omaga_c_2 * omaga_c_2.T) * omaga_c_2 * [2 * zeta_2 * allhunters[i].z_2.T * (allhunters[i].f_v - a_hat_dot)
+            - (zeta_2 * zeta_2 - 1) * allhunters[i].z_2.T * allhunters[i].z_2 + 1 / 4 * out_put_a_2 * out_put_a_2.T + omaga_c_2.T * model_c_2.linear.weight])
         # actor 网络更新
-        model_a_2.linear.weight += (
-                    1 / 2 * model_c_2.forward(allhunters[i].z_2)[1].T * allhunters[i].z_2 + gamma_c_2 / (
-                    4 * (1 + omaga_c_2 * omaga_c_2.T))
-                    * model_c_2.forward(allhunters[i].z_2)[1].T * model_c_2.forward(allhunters[i].z_2)[
-                        1] * model_a_2.linear.weight * omaga_c_2.T * model_c_2.linear.weight
-                    - gamma_a_2 * model_c_2.forward(allhunters[i].z_2)[1].T * model_c_2.forward(allhunters[i].z_2)[
-                        1] * model_a_2.linear.weight)
+        model_a_2.linear.weight += (1 / 2 * model_c_2.forward(allhunters[i].z_2)[1].T * allhunters[i].z_2 + gamma_c_2 / (4 * (1 + omaga_c_2 * omaga_c_2.T))
+                    * model_c_2.forward(allhunters[i].z_2)[1].T * model_c_2.forward(allhunters[i].z_2)[1] * model_a_2.linear.weight * omaga_c_2.T * model_c_2.linear.weight
+                    - gamma_a_2 * model_c_2.forward(allhunters[i].z_2)[1].T * model_c_2.forward(allhunters[i].z_2)[1] * model_a_2.linear.weight)
 
 
 
