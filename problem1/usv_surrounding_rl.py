@@ -61,6 +61,7 @@ class model():
         self.x += (self.u * cos(self.ang) - self.v * sin(self.ang)) * T
         self.y += (self.u * sin(self.ang) + self.v * cos(self.ang)) * T
         self.ang += self.r * T
+        self.f_v = np.array([(-D_11 * self.u + M_22 * self.v * self.r) / M_11] , [(-D_22 * self.v - M_11 * self.u * self.r) / M_22] , [(-D_33 * self.r - (M_22 - M_11) * self.u * self.v) / M_33])
 
     def z_1_and_z_1_dot(self, angle_up, angle_down, rho_up, rho_down, u_up, u_down, v_up, v_down, v_x0, v_y0):
         self.z_1 = (self.rho - rho_0) ** 2 + (2 * self.angle - angle_up - angle_down) ** 2 + (
@@ -168,7 +169,7 @@ model_c_2 = RBF(centers_c_2, n_out_c_2)
 model_a_2 = RBF(centers_a_2, n_out_a_2)
 
 epochs = 500
-
+a_hat_dot = 0
 
 for epoch in range(epochs):
     # critic 网络更新
@@ -192,6 +193,15 @@ for epoch in range(epochs):
     dot_v_2 = 2 * zeta_2 * model_1.z_2 + output_c_2
     out_put_a_2 = model_a_2(model_1.z_2)
     u_hat = -zeta_2 * model_1.z_2 - 1/2 * out_put_a_2
+    omaga_c_2 = -model_c_2.forward(model_1.z_2)[1] * [model_1.f_v-zeta_2 * model_1.z_2 - 1/2 * out_put_a_2 - a_hat_dot]
+    model_c_2.linear.weight += (-gamma_c_2 / (1 + omaga_c_2 * omaga_c_2.T) * omaga_c_2 * [2 * zeta_2 * model_1.z_2.T * (model_1.f_v - a_hat_dot)
+                              - (zeta_2 * zeta_2 - 1) * model_1.z_2.T * model_1.z_2 + 1 / 4 * out_put_a_2 * out_put_a_2.T + omaga_c_2.T * model_c_2.linear.weight])
+    model_a_2.linear.weight += (1 / 2 * model_c_2.forward(model_1.z_2)[1].T * model_1.z_2 + gamma_c_2 / (
+            4 * (1 + omaga_c_2 * omaga_c_2.T))
+                                * model_c_2.forward(model_1.z_2)[1].T * model_c_2.forward(model_1.z_2)[
+                                    1] * model_a_2.linear.weight * omaga_c_2.T * model_c_2.linear.weight
+                                - gamma_a_2 * model_c_2.forward(model_1.z_2)[1].T * model_c_2.forward(model_1.z_2)[
+                                    1] * model_a_2.linear.weight)
 
 
 
