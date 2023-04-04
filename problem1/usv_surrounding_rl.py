@@ -174,6 +174,7 @@ model_a_2 = RBF(centers_a_2, n_out_a_2)
 
 epochs = 500
 a_hat_dot = 0
+a_hat = 0
 
 for epoch in range(epochs):
 
@@ -182,6 +183,7 @@ for epoch in range(epochs):
         out_put_c_1 = model_c_1.forward(allhunters[i].z_1)[0]
         dot_v_1 = 2 * zeta_1 * allhunters[i].z_1 + out_put_c_1
         out_put_a_1 = model_a_1.forward(allhunters[i].z_1)[0]
+        a_hat_last = a_hat
         a_hat = np.linalg.inv(R) * allhunters[i].lambda_1 * (-zeta_1 * allhunters[i].z_1 - 1 / 2 * out_put_a_1)
         omaga_c_1 = -model_c_1.forward(allhunters[i].z_1)[1] * [
             allhunters[i].a * zeta_1 * allhunters[i].z_1 + 1 / 2 * allhunters[i].a * out_put_a_1 + allhunters[
@@ -195,6 +197,7 @@ for epoch in range(epochs):
                     - gamma_a_1 * model_c_1.forward(allhunters[i].z_1)[1].T * model_c_1.forward(allhunters[i].z_1)[1] * model_a_1.linear.weight)
 
         # Step 2
+        a_hat_dot = (a_hat - a_hat_last)/T_changeNN
         output_c_2 = model_c_1.forward(allhunters[i].z_2)[0]
         dot_v_2 = 2 * zeta_2 * allhunters[i].z_2 + output_c_2
         out_put_a_2 = model_a_2.forward(allhunters[i].z_2)[0]
