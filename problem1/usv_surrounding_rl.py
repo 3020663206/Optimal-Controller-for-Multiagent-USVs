@@ -31,7 +31,8 @@ centers_c_2 = torch.randn(num_centers, n_out_c_2)
 centers_a_1 = torch.randn(num_centers, n_out_a_1)
 centers_a_2 = torch.randn(num_centers, n_out_a_2)
 
-T = 0.1
+T_changeNN = 0.1
+T_changeState = 0.01
 
 NumberofHunters = 3
 
@@ -52,16 +53,16 @@ class model():
         self.q = np.array([cos(self.angle), -sin(self.angle)], [sin(self.angle), cos(self.angle)])
 
     def change_position(self, tau_1, tau_2):
-        u_next = (tau_1 - D_11 * self.u + M_22 * self.v * self.r) / M_11 * T
-        v_next = (-D_22 * self.v - M_11 * self.u * self.r) / M_22 * T
-        r_next = (tau_2 - D_33 * self.r - (M_22 - M_11) * self.u * self.v) / M_33 * T
+        u_next = (tau_1 - D_11 * self.u + M_22 * self.v * self.r) / M_11 * T_changeState
+        v_next = (-D_22 * self.v - M_11 * self.u * self.r) / M_22 * T_changeState
+        r_next = (tau_2 - D_33 * self.r - (M_22 - M_11) * self.u * self.v) / M_33 * T_changeState
         # 运动学模型 （1）
         self.u += u_next
         self.v += v_next
         self.r += r_next
-        self.x += (self.u * cos(self.ang) - self.v * sin(self.ang)) * T
-        self.y += (self.u * sin(self.ang) + self.v * cos(self.ang)) * T
-        self.ang += self.r * T
+        self.x += (self.u * cos(self.ang) - self.v * sin(self.ang)) * T_changeState
+        self.y += (self.u * sin(self.ang) + self.v * cos(self.ang)) * T_changeState
+        self.ang += self.r * T_changeState
         self.f_v = np.array([(-D_11 * self.u + M_22 * self.v * self.r) / M_11] , [(-D_22 * self.v - M_11 * self.u * self.r) / M_22] , [(-D_33 * self.r - (M_22 - M_11) * self.u * self.v) / M_33])
 
     def z_1_and_z_1_dot(self, angle_up, angle_down, rho_up, rho_down, u_up, u_down, v_up, v_down, v_x0, v_y0):
@@ -121,8 +122,8 @@ class target():
         self.v = -v_x * sin(self.ang) + v_y * cos(self.ang)
 
     def change_position(self):
-        self.x += self.v_x * T
-        self.y += self.v_y * T
+        self.x += self.v_x * T_changeState
+        self.y += self.v_y * T_changeState
 
 
 class RBF(torch.nn.Module):
