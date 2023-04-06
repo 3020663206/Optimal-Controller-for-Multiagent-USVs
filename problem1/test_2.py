@@ -1,3 +1,5 @@
+import model_def
+
 def num():
     a = 1
     b = 2
