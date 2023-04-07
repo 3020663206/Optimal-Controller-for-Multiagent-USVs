@@ -1,5 +1,5 @@
 import model_def
-
+import torch
 def num():
     a = 1
     b = 2
@@ -8,3 +8,4 @@ def num():
 
 r = num()
 print(r[1])
+print(torch.__version__)
