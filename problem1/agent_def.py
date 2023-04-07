@@ -1,4 +1,5 @@
-import math
+import numpy as np
+from math import pi, atan2, sqrt, sin, cos, atan
 
 
 def get_abs_min_key(dct):
@@ -8,14 +9,14 @@ def get_abs_max_key(dct):
     return max(dct, key=lambda k: abs(dct[k]))
 
 
-class Agent:
-    def __init__(self, id, x, y, angle):
+class Agent(object):
+    def __init__(self, id, pos_x, pos_y):
         self.front_neighbor = None
         self.back_neighbor = None
         self.id = id
-        self.x = x
-        self.y = y
-        self.angle = angle
+        self.pos_x = pos_x
+        self.pos_y = pos_y
+        #self.angle = angle
         self.front_neighbors_sets = {}
         self.back_neighbors_sets = {}
         self.front_neighbors_sets_1 = {}
@@ -23,7 +24,12 @@ class Agent:
         self.front_neighbors_sets_2 = {}
         self.back_neighbors_sets_2 = {}
 
-    def get_neighbors(self, agents):
+    def get_distance_and_angle(self, target_x, target_y):
+        self.distance = np.sqrt((target_x - self.pos_x) * (target_x - self.pos_x) + (target_y - self.pos_y) * (target_y - self.pos_y))
+        self.angle = (180/pi) * atan2(self.pos_y - target_y, self.pos_x - target_x)
+        self.Q_transform = np.array([cos(self.angle), -sin(self.angle)], [sin(self.angle), cos(self.angle)])
+
+    def get_sametype_neighbors(self, agents):
         self.front_neighbors_sets = {}
         self.back_neighbors_sets = {}
         self.front_neighbors_sets_1 = {}
@@ -63,14 +69,14 @@ class Agent:
 
 if __name__ == "__main__":
     agents = []
-    agents.append(Agent(0, 0, 0, 30))
-    agents.append(Agent(1, 1, 1, -60))
-    agents.append(Agent(2, 2, 2, 90))
-    agents.append(Agent(3, 3, 3, 135))
-    agents.append(Agent(4, 4, 4, -95))
-    agents.append(Agent(5, 5, 5, -34))
-    agents.append(Agent(6, 6, 6, 60))
-    agents.append(Agent(7, 7, 7, -61))
+    agents.append(Agent(0, 3, 4))
+    agents.append(Agent(1, 1, 1))
+    agents.append(Agent(2, 2, 2))
+    agents.append(Agent(3, 3, 3))
+    agents.append(Agent(4, 4, 4))
+    agents.append(Agent(5, 5, 5))
+    agents.append(Agent(6, 6, 6))
+    agents.append(Agent(7, 7, 7))
     for agent in agents:
         agent.get_neighbors(agents)
         print(f"Agent {agent.id} front neighbors: {agent.front_neighbor}")

@@ -55,7 +55,7 @@ class Agent(object):
 
 class Hunter(Agent):
 
-    def __init__(self, x, y, ang, u, v, r):
+    def __init__(self, pos_x, pos_y, ang, u, v, r):
         self.x = x
         self.y = y
         self.ang = ang
@@ -64,10 +64,6 @@ class Hunter(Agent):
         self.r = r
         self.V = np.array([u, v, r]).T
 
-    def get_rho_and_ang(self, x_0, y_0):
-        self.rho = np.sqrt((x_0 - self.x) * (x_0 - self.x) + (y_0 - self.y) * (y_0 - self.y))
-        self.angle = atan2(self.y - y_0, self.x - x_0 )
-        self.q = np.array([cos(self.angle), -sin(self.angle)], [sin(self.angle), cos(self.angle)])
 
     def change_position(self, tau_1, tau_2):
         u_next = (tau_1 - D_11 * self.u + M_22 * self.v * self.r) / M_11 * T_changeState
