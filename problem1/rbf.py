@@ -1,67 +1,99 @@
-import torch, random
+import torch
 import torch.nn as nn
-import torch.optim as optim
+import numpy as np
 
-torch.manual_seed(42)
+class RBFLayer(nn.Module):
+    def __init__(self, input_dim, num_centers, sigma=1.0):
+        super(RBFLayer, self).__init__()
+
+        self.num_centers = num_centers
+        self.sigma = sigma
+        self.centers = nn.Parameter(torch.randn(num_centers, input_dim))
+        self.linear = nn.Linear(num_centers, 3)
+
+    def forward(self, x):
+        # 计算径向基函数的输出
+        x = x.unsqueeze(1).expand(x.size(0), self.num_centers, x.size(-1))
+        c = self.centers.unsqueeze(0).expand(x.size(0), self.num_centers, x.size(-1))
+        distances = (x - c).pow(2).sum(-1)
+        output = (-distances / (2 * self.sigma ** 2)).exp()
+
+        # 使用线性层计算最终输出
+        output = self.linear(output)
+
+        return output
+
+# 创建数据集
+x_train = np.random.rand(100, 1)
+y_train = np.sin(x_train * np.pi) + np.random.normal(0, 0.1, (100, 1))
+
+# 将数据转换为 PyTorch 张量
+x_train = torch.tensor(x_train, dtype=torch.float)
+y_train = torch.tensor(y_train, dtype=torch.float)
+
+# 创建模型
+model = RBFLayer(1, 72)
+
+# 定义损失函数
+criterion = nn.MSELoss()
+
+# 定义优化器
+class CustomOptimizer(torch.optim.Optimizer):
+    def __init__(self, params, lr=1e-3):
+        defaults = dict(lr=lr)
+        super(CustomOptimizer, self).__init__(params, defaults)
+
+    def step(self, closure=None):
+        loss = None
+        if closure is not None:
+            loss = closure()
+
+        for group in self.param_groups:
+            for p in group['params']:
+                if p.grad is None:
+                    continue
+                grad = p.grad.data
+                state = self.state[p]
+                lr = group['lr']
+                if len(state) == 0:
+                    state['step'] = 0
+                    state['sum'] = torch.zeros_like(p.data)
+                state['step'] += 1
+                state['sum'] += grad ** 2
+                rms = state['sum'] / state['step']
+                p.data -= lr * grad / torch.sqrt(rms + 1e-8)
+
+        return loss
+
+optimizer = CustomOptimizer(model.parameters(), lr=0.1)
+
+# 训练模型
+for epoch in range(1000):
+    # 前向传播
+    y_pred = model(x_train)
+
+    # 计算损失函数
+    loss = criterion(y_pred, y_train)
+
+    # 反向传播和权重更新
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
+
+    # 输出每 100 次迭代后的损失值
+    if epoch % 100 == 0:
+        print(f"Epoch {epoch}, Loss: {loss.item():.4f}")
+        #print(model.linear.weight)
+
+# 测试模型
+x_test = torch.linspace(0, 1, 100).unsqueeze(1)
+y_test = model(x_test)
+
+# 绘制预测结果和原始数据的比较图
+import matplotlib.pyplot as plt
+plt.plot(x_train.numpy(), y_train.numpy(), 'o', label='Original data')
+plt.plot(x_test.numpy(), y_test.detach().numpy(), label='Fitted line')
+plt.legend()
+plt.show()
 
 
-class RBFN(nn.Module):
-    """
-    以高斯核作为径向基函数
-    """
-
-    def __init__(self, centers, n_out=3):
-        """
-        :param centers: shape=[center_num,data_dim]
-        :param n_out:
-        """
-        super(RBFN, self).__init__()
-        self.n_out = n_out
-        self.num_centers = centers.size(0)  # 隐层节点的个数
-        self.dim_centure = centers.size(1)  #
-        self.centers = nn.Parameter(centers)
-        # self.beta = nn.Parameter(torch.ones(1, self.num_centers), requires_grad=True)
-        self.beta = torch.ones(1, self.num_centers) * 10
-        # 对线性层的输入节点数目进行了修改
-        self.linear = nn.Linear(self.num_centers + self.dim_centure, self.n_out, bias=True)
-        self.initialize_weights()  # 创建对象时自动执行
-
-    def kernel_fun(self, batches):
-        n_input = batches.size(0)  # number of inputs
-        A = self.centers.view(self.num_centers, -1).repeat(n_input, 1, 1)
-        B = batches.view(n_input, -1).unsqueeze(1).repeat(1, self.num_centers, 1)
-        C = torch.exp(-self.beta.mul((A - B).pow(2).sum(2, keepdim=False)))
-        return C
-    def forward(self, batches):
-        radial_val = self.kernel_fun(batches)
-        class_score = self.linear(torch.cat([batches, radial_val], dim=1))
-        return class_score
-
-    def initialize_weights(self, ):
-        """
-        网络权重初始化
-        :return:
-        """
-        for m in self.modules():
-            if isinstance(m, nn.Conv2d):
-                m.weight.data.normal_(0, 0.02)
-                m.bias.data.zero_()
-            elif isinstance(m, nn.ConvTranspose2d):
-                m.weight.data.normal_(0, 0.02)
-                m.bias.data.zero_()
-            elif isinstance(m, nn.Linear):
-                m.weight.data.normal_(0, 0.02)
-                m.bias.data.zero_()
-
-    def print_network(self):
-        num_params = 0
-        for param in self.parameters():
-            num_params += param.numel()
-        print(self)
-        print('Total number of parameters: %d' % num_params)
-
-
-# centers = torch.rand((5,8))
-# rbf_net = RBFN(centers)
-# rbf_net.print_network()
-# rbf_net.initialize_weights()
