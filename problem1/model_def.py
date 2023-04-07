@@ -11,6 +11,7 @@ D_22 = 12.992
 D_33 = 0.0564
 
 rho_0 = 0.1
+R_rewardweights = np.eye(3)
 
 T_changeNN = 0.1
 T_changeState = 0.01
@@ -63,13 +64,13 @@ class Hunter(agent_def.Agent):
 
         self.dot_z_1 = self.lambda_1 * np.array([self.speed_u, self.speed_v, self.speed_r]) * self.lambda_2
 
-        self.a = self.lambda_1 * np.linalg.inv(R) * self.lambda_1.T
+        self.a = self.lambda_1 * np.linalg.inv(R_rewardweights) * self.lambda_1.T
 
         return self.z_1, self.dot_z_1
 
-    def calculate_sub_error(self, optimum_hat):
+    def calculate_sub_error(self, optimal_V_hat):
 
-        self.z_2 = self.V - optimum_hat
+        self.z_2 = self.V - optimal_V_hat
         return self.z_2
 
 class Invader(agent_def.Agent):
