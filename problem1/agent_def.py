@@ -1,5 +1,5 @@
 import numpy as np
-from math import pi, atan2, sqrt, sin, cos, atan
+from math import pi, atan2, sin, cos
 
 
 def get_abs_min_key(dct):
@@ -26,8 +26,8 @@ class Agent(object):
 
     def get_distance_and_angle(self, target_x, target_y):
         self.distance = np.sqrt((target_x - self.pos_x) * (target_x - self.pos_x) + (target_y - self.pos_y) * (target_y - self.pos_y))
-        self.angle = (180/pi) * atan2(self.pos_y - target_y, self.pos_x - target_x)
-        #self.Q_transform = np.array([cos(self.angle), -sin(self.angle)], [sin(self.angle), cos(self.angle)])
+        self.angle = atan2(self.pos_y - target_y, self.pos_x - target_x)
+        self.Q_transform = np.array(([cos(self.angle), -sin(self.angle)], [sin(self.angle), cos(self.angle)]))
 
     def get_sametype_neighbors(self, agents):
         self.front_neighbors_sets = {}
@@ -40,18 +40,18 @@ class Agent(object):
             if agent.id != self.id:
                 angle_diff = self.angle - agent.angle
                 if self.angle >= 0:
-                    if self.angle - 180 <= angle_diff <= 0:
+                    if self.angle - pi <= angle_diff <= 0:
                         self.front_neighbors_sets_1[agent.id] = angle_diff
-                    elif 180 < angle_diff <= 180 + self.angle:
+                    elif pi < angle_diff <= pi + self.angle:
                         self.front_neighbors_sets_2[agent.id] = angle_diff
-                    elif 0 < angle_diff < 180:
+                    elif 0 < angle_diff < pi:
                         self.back_neighbors_sets[agent.id] = angle_diff
                 else:
-                    if -180 <= angle_diff <= 0:
+                    if -pi <= angle_diff <= 0:
                         self.front_neighbors_sets[agent.id] = angle_diff
-                    elif self.angle - 180 <= angle_diff < -180:
+                    elif self.angle - pi <= angle_diff < -pi:
                         self.back_neighbors_sets_2[agent.id] = angle_diff
-                    elif 0 < angle_diff <= 180 + self.angle:
+                    elif 0 < angle_diff <= pi + self.angle:
                         self.back_neighbors_sets_1[agent.id] = angle_diff
         if self.angle >= 0:
             if self.front_neighbors_sets_1 == {}:

@@ -8,6 +8,27 @@ import torch
 import model_def
 import rbf_network
 
+zeta_1 = 10
+zeta_2 = 14
+
+R = np.eye(3)
+
+eta_c_1 = 0.1
+eta_c_2 = 0.01
+eta_a_1 = 0.3
+eta_a_2 = 0.4
+num_centers = 72
+centers_c_1 = 0
+centers_a_1 = 0
+centers_c_2 = 0
+centers_a_2 = 0
+n_out_c_1 = 1
+n_out_c_2 = 3
+n_out_a_1 = 3
+n_out_a_2 = 2
+
+NumberofHunters = 3
+NumberofInvaders = 1
 
 #model_1 = model(0, 0, 0, 0, 0, 0)
 #model_2 = model(0, 0, 0, 0, 0, 0)
