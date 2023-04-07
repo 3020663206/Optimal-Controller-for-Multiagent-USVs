@@ -27,7 +27,7 @@ class Agent(object):
     def get_distance_and_angle(self, target_x, target_y):
         self.distance = np.sqrt((target_x - self.pos_x) * (target_x - self.pos_x) + (target_y - self.pos_y) * (target_y - self.pos_y))
         self.angle = (180/pi) * atan2(self.pos_y - target_y, self.pos_x - target_x)
-        self.Q_transform = np.array([cos(self.angle), -sin(self.angle)], [sin(self.angle), cos(self.angle)])
+        #self.Q_transform = np.array([cos(self.angle), -sin(self.angle)], [sin(self.angle), cos(self.angle)])
 
     def get_sametype_neighbors(self, agents):
         self.front_neighbors_sets = {}
@@ -70,14 +70,16 @@ class Agent(object):
 if __name__ == "__main__":
     agents = []
     agents.append(Agent(0, 3, 4))
-    agents.append(Agent(1, 1, 1))
-    agents.append(Agent(2, 2, 2))
-    agents.append(Agent(3, 3, 3))
-    agents.append(Agent(4, 4, 4))
-    agents.append(Agent(5, 5, 5))
-    agents.append(Agent(6, 6, 6))
-    agents.append(Agent(7, 7, 7))
-    for agent in agents:
-        agent.get_neighbors(agents)
-        print(f"Agent {agent.id} front neighbors: {agent.front_neighbor}")
-        print(f"Agent {agent.id} back neighbors: {agent.back_neighbor}")
+    agents.append(Agent(1, 4, -6))
+    agents.append(Agent(2, 2, 4))
+    agents.append(Agent(3, -3, 3))
+    agents.append(Agent(4, 6, -5))
+    agents.append(Agent(5, 4, 2))
+    agents.append(Agent(6, -6, 6))
+    agents.append(Agent(7, 7, -3))
+    for agent_i in agents:
+        agent_i.get_distance_and_angle(0, 0)
+    for agent_i in agents:
+        agent_i.get_sametype_neighbors(agents)
+        print(f"Agent {agent_i.id} front neighbors: {agent_i.front_neighbor}")
+        print(f"Agent {agent_i.id} back neighbors: {agent_i.back_neighbor}")
