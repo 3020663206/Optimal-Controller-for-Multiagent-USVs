@@ -1,5 +1,5 @@
 import numpy as np
-from math import pi, atan2, sqrt, sin, cos, atan
+from math import pi, atan2, sin, cos
 
 import agent_def
 
@@ -70,7 +70,7 @@ class Hunter(agent_def.Agent):
 
     def calculate_sub_error(self, optimal_V_hat):
 
-        self.z_2 = self.V - optimal_V_hat
+        self.z_2 = self.vector_V - optimal_V_hat
         return self.z_2
 
 class Invader(agent_def.Agent):
