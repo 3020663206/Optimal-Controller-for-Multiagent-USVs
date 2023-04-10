@@ -9,3 +9,4 @@ def num():
 r = num()
 print(r[1])
 print(torch.__version__)
+print(dir(torch.distributions))
