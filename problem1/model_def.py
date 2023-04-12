@@ -26,6 +26,7 @@ class Hunter(agent_def.Agent):
         self.speed_r = speed_r
         self.vector_V = np.array([speed_u, speed_v, speed_r]).T
         self.a = 0
+        self.u_hat = 0
 
     def change_position(self, tau_1, tau_2):
         u_next = (tau_1 - D_11 * self.speed_u + M_22 * self.speed_v * self.speed_r) / M_11 * T_changeState
@@ -65,15 +66,15 @@ class Hunter(agent_def.Agent):
         self.delta = self.beta_2 * Q_transform_front * np.array([u_front, v_front]) + self.beta_3 * Q_transform_behind * np.array([u_behind, v_behind])
 
         self.lambda_1 = np.array([(self.alpha_1 + self.beta_1 - self.gamma_1) * self.Q_transform, self.gamma_1])
-        print(self.Q_transform)
-        print(self.Q_transform.shape)
-        print((self.alpha_1 + self.beta_1 - self.gamma_1))
-        print((self.alpha_1 + self.beta_1 - self.gamma_1).shape)
-        print(((self.alpha_1 + self.beta_1 - self.gamma_1) * self.Q_transform))
-        print(((self.alpha_1 + self.beta_1 - self.gamma_1) * self.Q_transform).shape)
-        print(self.gamma_1)
-        print(self.lambda_1)
-        print(self.lambda_1.shape)
+        # print(self.Q_transform)
+        # print(self.Q_transform.shape)
+        # print((self.alpha_1 + self.beta_1 - self.gamma_1))
+        # print((self.alpha_1 + self.beta_1 - self.gamma_1).shape)
+        # print(((self.alpha_1 + self.beta_1 - self.gamma_1) * self.Q_transform))
+        # print(((self.alpha_1 + self.beta_1 - self.gamma_1) * self.Q_transform).shape)
+        # print(self.gamma_1)
+        # print(self.lambda_1)
+        # print(self.lambda_1.shape)
         self.lambda_2 = (self.alpha_1 + self.beta_1 - self.beta_2 - self.beta_3) * np.array([v_target_x, v_target_y])
 
         self.dot_z_1 = self.lambda_1 * np.array([self.speed_u, self.speed_v, self.speed_r]) * self.lambda_2
