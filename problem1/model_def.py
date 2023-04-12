@@ -2,6 +2,7 @@ import numpy as np
 from math import pi, atan2, sin, cos
 
 import agent_def
+import adp_drl_nn
 
 M_11 = 1.956
 M_22 = 2.405
@@ -24,9 +25,12 @@ class Hunter(agent_def.Agent):
         self.speed_u = speed_u
         self.speed_v = speed_v
         self.speed_r = speed_r
-        self.vector_V = np.array([speed_u, speed_v, speed_r]).T
+        self.vector_V = np.array([self.speed_u, self.speed_v, self.speed_r]).T
         self.a = 0
-        self.u_hat = 0
+        self.u_hat = [0, 0]
+        self.optimal_V_hat = 0
+        self.optimal_V_hat_last = 0
+        self.optimal_V_hat_dot = 0
 
     def change_position(self, tau_1, tau_2):
         u_next = (tau_1 - D_11 * self.speed_u + M_22 * self.speed_v * self.speed_r) / M_11 * T_changeState
@@ -83,10 +87,20 @@ class Hunter(agent_def.Agent):
 
         return self.z_1, self.dot_z_1
 
-    def calculate_sub_error(self, optimal_V_hat):
+    def calculate_virtual_opitmal(self, actor_1_nn_outputs):
+        self.optimal_V_hat_last = self.optimal_V_hat
+        self.optimal_V_hat = np.linalg.inv(R_rewardweights) * self.lambda_1.T * (
+                    -adp_drl_nn.zeta_1 * self.z_1 - 1 / 2 * actor_1_nn_outputs)
+        self.optimal_V_hat_dot = (self.optimal_V_hat - self.optimal_V_hat_last) / T_changeNN
 
-        self.z_2 = self.vector_V - optimal_V_hat
+    def calculate_sub_error(self):
+
+        self.z_2 = self.vector_V - self.optimal_V_hat
         return self.z_2
+
+    def calculate_actual_opitmal(self, actor_2_nn_outputs):
+        self.u_hat = -adp_drl_nn.zeta_2 * self.z_2 - 1 / 2 * actor_2_nn_outputs
+
 
 class Invader(agent_def.Agent):
 
