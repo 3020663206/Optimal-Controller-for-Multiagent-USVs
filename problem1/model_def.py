@@ -25,6 +25,7 @@ class Hunter(agent_def.Agent):
         self.speed_v = speed_v
         self.speed_r = speed_r
         self.vector_V = np.array([speed_u, speed_v, speed_r]).T
+        self.a = 0
 
     def change_position(self, tau_1, tau_2):
         u_next = (tau_1 - D_11 * self.speed_u + M_22 * self.speed_v * self.speed_r) / M_11 * T_changeState
