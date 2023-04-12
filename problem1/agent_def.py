@@ -65,21 +65,18 @@ class Agent(object):
             else:
                 self.back_neighbor = get_abs_min_key(self.back_neighbors_sets_1)
             self.front_neighbor = get_abs_min_key(self.front_neighbors_sets)
-
+        return self.front_neighbor,self.back_neighbor
 
 if __name__ == "__main__":
     agents = []
-    agents.append(Agent(0, 3, 4))
-    agents.append(Agent(1, 4, -6))
-    agents.append(Agent(2, 2, 4))
-    agents.append(Agent(3, -3, 3))
-    agents.append(Agent(4, 6, -5))
-    agents.append(Agent(5, 4, 2))
-    agents.append(Agent(6, -6, 6))
-    agents.append(Agent(7, 7, -3))
+    agents.append(Agent(0, 1, 7))
+    agents.append(Agent(1, 5, 1))
+    agents.append(Agent(2, 2, 8))
+
     for agent_i in agents:
         agent_i.get_distance_and_angle(0, 0)
     for agent_i in agents:
         agent_i.get_sametype_neighbors(agents)
+        print(agent_i.get_sametype_neighbors(agents))
         print(f"Agent {agent_i.id} front neighbors: {agent_i.front_neighbor}")
         print(f"Agent {agent_i.id} back neighbors: {agent_i.back_neighbor}")

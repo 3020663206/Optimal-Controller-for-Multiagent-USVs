@@ -15,7 +15,7 @@ class RBFLayer(nn.Module):
         # 计算径向基函数的输出
         x = x.unsqueeze(1).expand(x.size(0), self.num_centers, x.size(-1))
         c = self.centers.unsqueeze(0).expand(x.size(0), self.num_centers, x.size(-1))
-        distances = (x - c).pow(2).sum(-1)
+        distances = sum
         output = (-distances / (2 * self.sigma ** 2)).exp()
 
         # 使用线性层计算最终输出

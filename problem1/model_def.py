@@ -10,7 +10,7 @@ D_11 = 2.436
 D_22 = 12.992
 D_33 = 0.0564
 
-rho_0 = 0.1
+rho_0 = 3
 R_rewardweights = np.eye(3)
 
 T_changeNN = 0.1
@@ -47,20 +47,33 @@ class Hunter(agent_def.Agent):
         self.z_1 = (self.distance - rho_0) ** 2 + (2 * self.angle - angle_front - angle_behind) ** 2 + (self.orientation + pi / 2 - self.angle)
 
         self.alpha_1 = 2 * (self.distance - rho_0) * (np.array([[cos(self.angle), sin(self.angle)]]))
+        #print(self.alpha_1)
 
         self.beta_1 = (4 * (2 * self.angle - angle_front - angle_behind) * (np.array([[-sin(self.angle), cos(self.angle)]]))) / self.distance
         self.beta_2 = (2 * (2 * self.angle - angle_front - angle_behind) * (np.array([[-sin(angle_front), cos(angle_behind)]]))) / rho_front
         self.beta_3 = (2 * (2 * self.angle - angle_front - angle_behind) * (np.array([[-sin(angle_behind), cos(angle_behind)]]))) / rho_behind
-
+        #print(self.beta_1)
+        #print(self.beta_2)
+        #print(self.beta_3)
         self.gamma_1 = 2 * (self.orientation + pi / 2 - self.angle)
         self.gamma_2 = (2 * (self.orientation + pi / 2 - self.angle) * (np.array([[-sin(self.angle), cos(self.angle)]]))) / self.distance
-
+        #print(self.gamma_1)
+        #print(self.gamma_2)
         Q_transform_front = np.array([[cos(angle_front), -sin(angle_front)], [sin(angle_front), cos(angle_front)]])
         Q_transform_behind = np.array([[cos(angle_behind), -sin(angle_behind)], [sin(angle_behind), cos(angle_behind)]])
 
         self.delta = self.beta_2 * Q_transform_front * np.array([u_front, v_front]) + self.beta_3 * Q_transform_behind * np.array([u_behind, v_behind])
 
         self.lambda_1 = np.array([(self.alpha_1 + self.beta_1 - self.gamma_1) * self.Q_transform, self.gamma_1])
+        print(self.Q_transform)
+        print(self.Q_transform.shape)
+        print((self.alpha_1 + self.beta_1 - self.gamma_1))
+        print((self.alpha_1 + self.beta_1 - self.gamma_1).shape)
+        print(((self.alpha_1 + self.beta_1 - self.gamma_1) * self.Q_transform))
+        print(((self.alpha_1 + self.beta_1 - self.gamma_1) * self.Q_transform).shape)
+        print(self.gamma_1)
+        print(self.lambda_1)
+        print(self.lambda_1.shape)
         self.lambda_2 = (self.alpha_1 + self.beta_1 - self.beta_2 - self.beta_3) * np.array([v_target_x, v_target_y])
 
         self.dot_z_1 = self.lambda_1 * np.array([self.speed_u, self.speed_v, self.speed_r]) * self.lambda_2
