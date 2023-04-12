@@ -10,19 +10,21 @@ center_numbers = 72
 
 Timeoftheworld = 0
 
-SimulationLimits = 100000
+SimulationLimits = 1000000
 
-allhunters = []
 
-agent_invader = []
 
-all_critic_1 = []
-all_critic_2 = []
-all_actor_1 = []
-all_actor_2 = []
+allhunters = [None, None, None]
 
-z_1_set = []
-z_2_set = []
+agent_invader = [None]
+
+all_critic_1 = [None, None, None]
+all_critic_2 = [None, None, None]
+all_actor_1 = [None, None, None]
+all_actor_2 = [None, None, None]
+
+z_1_set = [None, None, None]
+z_2_set = [None, None, None]
 
 def create_world():
 
@@ -42,7 +44,7 @@ def create_world():
         all_critic_2[i] = adp_drl_nn.Critic2_NN(center_numbers)
         all_actor_2[i] = adp_drl_nn.Actor2_NN(center_numbers)
 
-def change_state(Time):
+def change_state(Timeoftheworld):
 
     for i in range(NumberofHunters):
         # 改变每个智能体的状态
@@ -92,8 +94,9 @@ def change_network(Timeoftheworld):
         all_critic_2[i].backward(allhunters[i], all_actor_2[i], allhunters[i].optimal_V_hat_dot)
         all_actor_2[i].backward(allhunters[i], all_critic_2[i], allhunters[i].optimal_V_hat_dot)
 
-
 def train_world():
+
+    numbercount = 0
 
     for i in range(SimulationLimits):
 
@@ -102,8 +105,15 @@ def train_world():
         change_state(Timeoftheworld)
         Timeoftheworld += model_def.T_changeState
 
+        numbercount += 1
+
+        if(numbercount == (model_def.T_changeNN / model_def.T_changeState)):
+
+            change_network(Timeoftheworld)
+            numbercount = 0
 
 
+if __name__ == "__main__":
 
-
-
+    create_world()
+    train_world()
