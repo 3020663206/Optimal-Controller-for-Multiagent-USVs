@@ -10,6 +10,8 @@ Timeoftheworld = 0
 
 SimulationLimits = 1000000
 
+center_nums = 72
+
 allhunters = [None, None, None]
 
 agent_invader = [None]
@@ -113,3 +115,4 @@ if __name__ == "__main__":
 
     create_world()
     train_world()
+
