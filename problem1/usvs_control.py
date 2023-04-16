@@ -6,13 +6,9 @@ from math import atan,sin,cos,pi
 
 NumberofHunters = 3
 
-center_numbers = 72
-
 Timeoftheworld = 0
 
 SimulationLimits = 1000000
-
-
 
 allhunters = [None, None, None]
 
@@ -39,10 +35,10 @@ def create_world():
         z_1_set[i] = []
         z_2_set[i] = []
 
-        all_critic_1[i] = adp_drl_nn.Critic1_NN(center_numbers)
-        all_actor_1[i] = adp_drl_nn.Actor1_NN(center_numbers)
-        all_critic_2[i] = adp_drl_nn.Critic2_NN(center_numbers)
-        all_actor_2[i] = adp_drl_nn.Actor2_NN(center_numbers)
+        all_critic_1[i] = adp_drl_nn.Critic1_NN(72, 1)
+        all_actor_1[i] = adp_drl_nn.Actor1_NN(72, 1)
+        all_critic_2[i] = adp_drl_nn.Critic2_NN(72, 2)
+        all_actor_2[i] = adp_drl_nn.Actor2_NN(72, 2)
 
 def change_state(Timeoftheworld):
 

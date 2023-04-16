@@ -12,8 +12,9 @@ zeta_2 = 14
 
 class RBFN(object):
 
-    def __init__(self, hidden_nums): #还有一些超参数可能需要初始化
+    def __init__(self, hidden_nums, output_nums): #还有一些超参数可能需要初始化
         self.hidden_nums = hidden_nums
+        self.output_nums = output_nums
         self.feature_nums = 0
         self.sample_nums = 0
         self.gaussian_kernel_width = 0  # 高斯核宽度
@@ -26,7 +27,7 @@ class RBFN(object):
     def init(self):
         gaussian_kernel_width = np.random.random((self.hiddencenters, 1))               #待修改
         hiddencenters = np.random.random((self.hidden_nums, self.feature_nums))     #待修改
-        linearweights = np.random.random((self.hidden_nums + 1, 1))                 #待修改
+        linearweights = np.random.random((self.hidden_nums + 1, self.output_nums))                 #待修改
         return gaussian_kernel_width, hiddencenters, linearweights
 
     def forward(self, inputs):
@@ -50,8 +51,8 @@ class RBFN(object):
 
 class Critic1_NN(RBFN):
 
-    def __init__(self, hidden_nums):
-        super().__init__(hidden_nums)
+    def __init__(self, hidden_nums, output_nums):
+        super().__init__(hidden_nums, output_nums)
         self.varpi_super = 0
         self.linearweights_last = 0
 
@@ -68,8 +69,8 @@ class Critic1_NN(RBFN):
 
 class Actor1_NN(RBFN):
 
-    def __init__(self, hidden_nums):
-        super().__init__(hidden_nums)
+    def __init__(self, hidden_nums, output_nums):
+        super().__init__(hidden_nums, output_nums)
         self.varpi_super = 0
         self.linearweights_last = 0
 
@@ -85,8 +86,8 @@ class Actor1_NN(RBFN):
 
 class Critic2_NN(RBFN):
 
-    def __init__(self, hidden_nums):
-        super().__init__(hidden_nums)
+    def __init__(self, hidden_nums, output_nums):
+        super().__init__(hidden_nums, output_nums)
         self.varpi_sub = 0
         self.linearweights_last = 0
 
@@ -102,8 +103,8 @@ class Critic2_NN(RBFN):
 
 class Actor2_NN(RBFN):
 
-    def __init__(self, hidden_nums):
-        super().__init__(hidden_nums)
+    def __init__(self, hidden_nums, output_nums):
+        super().__init__(hidden_nums, output_nums)
         self.varpi_sub = 0
         self.linearweights_last = 0
 
